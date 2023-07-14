@@ -123,6 +123,7 @@ function displayFivedayforecast(fivedaysData, city) {
         var temp = fivedaysData.list[i].main.temp;
         var humidity = fivedaysData.list[i].main.humidity;
         var wind = fivedaysData.list[i].wind.speed;
+        var weatherIcon = fivedaysData.list[i].weather[0].icon;
 
         var cardContainer = document.createElement('div');
         cardContainer.classList = 'col';
@@ -136,6 +137,11 @@ function displayFivedayforecast(fivedaysData, city) {
         var dateEl = document.createElement('h5');
         dateEl.classList = 'card-title';
         dateEl.textContent = formatDate(date);
+
+        var iconEl = document.createElement('img');
+        iconEl.classList = 'weather-icon';
+        iconEl.src = getIconUrl(weatherIcon);
+        iconEl.alt = 'Weather Icon';
     
         var temperatureEl = document.createElement('p');
         temperatureEl.classList = 'card-text';
@@ -150,6 +156,7 @@ function displayFivedayforecast(fivedaysData, city) {
         humidityEl.textContent = 'Humidity: ' + humidity + '%';
     
         cardBody.appendChild(dateEl);
+        cardBody.appendChild(iconEl);
         cardBody.appendChild(temperatureEl);
         cardBody.appendChild(windEl);
         cardBody.appendChild(humidityEl);
@@ -177,7 +184,7 @@ var displaySearchHistory = function() {
   
     for (var i = 0; i < searchHistory.length; i++) {
       var historyItem = document.createElement('a');
-      historyItem.classList = 'history-item';
+      historyItem.classList = 'history-item list-group-item list-group-item-action';
       historyItem.textContent = searchHistory[i];
       historyItem.setAttribute('data-city', searchHistory[i]);
   
@@ -185,6 +192,7 @@ var displaySearchHistory = function() {
         var city = this.getAttribute('data-city');
         getCurrentweather(city);
         currentWeatherEl.textContent = '';
+        getFivedayWeather(city);
       });
   
       searchHistoryEl.appendChild(historyItem);
