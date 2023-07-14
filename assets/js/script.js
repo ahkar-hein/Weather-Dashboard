@@ -207,23 +207,22 @@ var displaySearchHistory = function() {
       });
         searchHistoryEl.appendChild(historyItem);
     }
-    var clearBtn = document.createElement('a');
-    clearBtn.classList = 'clear-item list-group-item list-group-item-action';
-    clearBtn.setAttribute('style', 'color:red');
-    clearBtn.textContent = 'Clear History';
-    clearBtn.addEventListener('click', function() {
-    clearSearchHistory();
-    });
-    searchHistoryEl.appendChild(clearBtn);
+        var clearBtn = document.createElement('a');
+        clearBtn.classList = 'clear-item list-group-item list-group-item-action';
+        clearBtn.setAttribute('style', 'color:red');
+        clearBtn.textContent = 'Clear History';
+        clearBtn.addEventListener('click', function() {
+        clearSearchHistory();
+        });
+        searchHistoryEl.appendChild(clearBtn);
+        var clearSearchHistory = function() {
+            localStorage.clear();
+            displaySearchHistory();
+          }
   };
-  var clearSearchHistory = function() {
-    var searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-    
-    for (var i = 0; i < searchHistory.length; i++) {
-      var city = searchHistory[i];
-      deleteSearchHistory(city);
-    }
-  }
+
 form.addEventListener("submit", formSubmit, displaySearchHistory());
+
+
 
 
