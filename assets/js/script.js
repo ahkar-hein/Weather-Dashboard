@@ -45,7 +45,7 @@ var getFivedayWeather = function (cityName) {
         .then(function (response) {
             if (response.ok) {
                 response.json().then(function(data) {
-                    displayFivedayforecast(data, cityName)
+                    displayFivedayforecast(data)
                     // console.log(data);
                 })
             } else {
@@ -57,7 +57,7 @@ var getFivedayWeather = function (cityName) {
         })
 }
 
-var displayCurrentweather = function (currentData, city) {
+var displayCurrentweather = function (currentData) {
     currentWeatherEl.textContent = '';
 
     var currentName = currentData.name;
@@ -69,6 +69,17 @@ var displayCurrentweather = function (currentData, city) {
     var currentIcon = currentData.weather[0].icon;
     // console.log(currentName, currentDate, currentTemp, currentWind, currentHumidity);
     
+    if (description.includes('clear')) {
+        document.body.style.backgroundImage = "url('./assets/images/clear.jpg')";
+    } else if (description.includes('thunderstorm')) {
+        document.body.style.backgroundImage = "url('./assets/images/thunderstrom.jpg')";
+    } else if (description.includes('rain')) {
+        document.body.style.backgroundImage = "url('./assets/images/rain.jpg')";
+    } else {
+        // Default background image for other weather conditions
+        document.body.style.backgroundImage = "url('./assets/images/clear.jpg')";
+    }
+
     var currentEl = document.createElement('div');
     currentEl.classList = 'list-item flex-row justify-space-between align-center';
 
@@ -194,11 +205,25 @@ var displaySearchHistory = function() {
         currentWeatherEl.textContent = '';
         getFivedayWeather(city);
       });
-  
-      searchHistoryEl.appendChild(historyItem);
+        searchHistoryEl.appendChild(historyItem);
     }
+    var clearBtn = document.createElement('a');
+    clearBtn.classList = 'clear-item list-group-item list-group-item-action';
+    clearBtn.setAttribute('style', 'color:red');
+    clearBtn.textContent = 'Clear History';
+    clearBtn.addEventListener('click', function() {
+    clearSearchHistory();
+    });
+    searchHistoryEl.appendChild(clearBtn);
   };
-
+  var clearSearchHistory = function() {
+    var searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    
+    for (var i = 0; i < searchHistory.length; i++) {
+      var city = searchHistory[i];
+      deleteSearchHistory(city);
+    }
+  }
 form.addEventListener("submit", formSubmit, displaySearchHistory());
 
 
