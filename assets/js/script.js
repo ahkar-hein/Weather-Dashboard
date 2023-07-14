@@ -3,6 +3,8 @@ var searchBtn = document.querySelector("#search");
 var form = document.querySelector('#user-form')
 var currentWeatherEl = document.querySelector('#currentWeatherContainer');
 var fivedaysEl = document.querySelector('#fivedaysForecast')
+var searchHistoryEl = document.querySelector('#searchHistory');
+
 var key = "fa7dfdeff2817a4b3a31fef9131a11f3";
 
 var formSubmit = function (event) {
@@ -12,7 +14,7 @@ var formSubmit = function (event) {
     if (cityInput) {
         getCurrentweather(cityInput);
         getFivedayWeather(cityInput);
-        currentWeatherEl.textContent = '';
+        addSearchHistory(cityInput);
     } else {
         alert("Please Enter City Name");
     }
@@ -56,11 +58,14 @@ var getFivedayWeather = function (cityName) {
 }
 
 var displayCurrentweather = function (currentData, city) {
+    currentWeatherEl.textContent = '';
+
     var currentName = currentData.name;
     var currentDate = currentData.dt;
     var currentTemp = currentData.main.temp;
     var currentWind = currentData.wind.speed;
     var currentHumidity = currentData.main.humidity;
+    var description = currentData.weather[0].description;
     var currentIcon = currentData.weather[0].icon;
     // console.log(currentName, currentDate, currentTemp, currentWind, currentHumidity);
     
@@ -79,6 +84,9 @@ var displayCurrentweather = function (currentData, city) {
     iconEl.src = getIconUrl(currentIcon);
     iconEl.alt = 'Weather Icon';
 
+    var desEl = document.createElement('li');
+    desEl.textContent = 'Condition: ' + description;
+
     var temperatureEl = document.createElement('li');
     temperatureEl.textContent = 'Temperature: ' + currentTemp + '°F';
 
@@ -92,6 +100,7 @@ var displayCurrentweather = function (currentData, city) {
     currentEl.appendChild(setCityName);
     currentEl.appendChild(dateEl);
     currentEl.appendChild(iconEl);
+    currentEl.appendChild(desEl);
     currentEl.appendChild(temperatureEl);
     currentEl.appendChild(windEl);
     currentEl.appendChild(humidityEl);
@@ -106,7 +115,8 @@ function formatDate(timestamp) {
   }
 
 function displayFivedayforecast(fivedaysData, city) {
-        fivedaysEl.innerHTML = '';
+
+    fivedaysEl.innerHTML = '';
     for(var i=0; i < fivedaysData.list.length; i+=8){
         console.log(fivedaysData.list[i])
         var date = fivedaysData.list[i].dt;
@@ -151,6 +161,36 @@ function displayFivedayforecast(fivedaysData, city) {
         fivedaysEl.appendChild(cardContainer);
     }
 }
-form.addEventListener("submit", formSubmit);
+var addSearchHistory = function(city) {
+    var searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    if (!searchHistory.includes(city)) {
+      searchHistory.push(city);
+      localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+      displaySearchHistory();
+    }
+};
+
+var displaySearchHistory = function() {
+    searchHistoryEl.innerHTML = '';
+  
+    var searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+  
+    for (var i = 0; i < searchHistory.length; i++) {
+      var historyItem = document.createElement('a');
+      historyItem.classList = 'history-item';
+      historyItem.textContent = searchHistory[i];
+      historyItem.setAttribute('data-city', searchHistory[i]);
+  
+      historyItem.addEventListener('click', function() {
+        var city = this.getAttribute('data-city');
+        getCurrentweather(city);
+        currentWeatherEl.textContent = '';
+      });
+  
+      searchHistoryEl.appendChild(historyItem);
+    }
+  };
+
+form.addEventListener("submit", formSubmit, displaySearchHistory());
 
 
