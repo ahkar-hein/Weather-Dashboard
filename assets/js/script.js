@@ -2,6 +2,7 @@ var cityEl = document.querySelector('#city');
 var searchBtn = document.querySelector("#search");
 var form = document.querySelector('#user-form')
 var currentWeatherEl = document.querySelector('#currentWeatherContainer');
+var fivedaysEl = document.querySelector('#fivedaysForecast')
 var key = "fa7dfdeff2817a4b3a31fef9131a11f3";
 
 var formSubmit = function (event) {
@@ -10,6 +11,7 @@ var formSubmit = function (event) {
     var cityInput = cityEl.value.trim();
     if (cityInput) {
         getCurrentweather(cityInput);
+        getFivedayWeather(cityInput);
         currentWeatherEl.textContent = '';
     } else {
         alert("Please Enter City Name");
@@ -17,24 +19,138 @@ var formSubmit = function (event) {
 };
 
 var getCurrentweather = function (cityName) {
-    var CurrentWeatherApi = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&unit=metric&appid=" + key;
+    var CurrentWeatherApi = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&units=imperial&appid=" + key;
     fetch(CurrentWeatherApi)
-    .then(function (response) {
-        if(response.ok){
-            response.json().then(function (data) {
-                // displayCurrentweather(data, cityName);
-                console.log(response);
-                console.log(data, cityName)
-            })
-        } else {
-            alert('Error:' + response.status)
-        }
+        .then(function (response) {
+            if(response.ok){
+                response.json().then(function (data) {
+                    displayCurrentweather(data, cityName);
+                    // console.log(response);
+                    console.log(data, cityName)
+                })
+            } else {
+                alert('Error:' + response.status)
+            }
     })
     .catch(function (error) {
         alert('Unable to connect to Server');
     });   
 };
 
+var getFivedayWeather = function (cityName) {
+    var fivedayweatherApi = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&units=imperial&appid=" + key;
+    fetch(fivedayweatherApi)
+        .then(function (response) {
+            if (response.ok) {
+                response.json().then(function(data) {
+                    displayFivedayforecast(data, cityName)
+                    // console.log(data);
+                })
+            } else {
+                alert('Error:' + response.status)
+            }
+        })
+        .catch(function(error) {
+            alert('Unable to connect to Server');
+        })
+}
 
+var displayCurrentweather = function (currentData, city) {
+    var currentName = currentData.name;
+    var currentDate = currentData.dt;
+    var currentTemp = currentData.main.temp;
+    var currentWind = currentData.wind.speed;
+    var currentHumidity = currentData.main.humidity;
+    var currentIcon = currentData.weather[0].icon;
+    // console.log(currentName, currentDate, currentTemp, currentWind, currentHumidity);
+    
+    var currentEl = document.createElement('div');
+    currentEl.classList = 'list-item flex-row justify-space-between align-center';
+
+    var setCityName = document.createElement('h1');
+    setCityName.textContent = currentName;
+
+    var dateEl = document.createElement('span');
+    dateEl.classList = 'date';
+    dateEl.textContent = formatDate(currentDate);
+
+    var iconEl = document.createElement('img');
+    iconEl.classList = 'weather-icon';
+    iconEl.src = getIconUrl(currentIcon);
+    iconEl.alt = 'Weather Icon';
+
+    var temperatureEl = document.createElement('li');
+    temperatureEl.textContent = 'Temperature: ' + currentTemp + '°F';
+
+    var windEl = document.createElement('li');
+    windEl.textContent = 'Wind Speed: ' + currentWind + ' m/s';
+
+    var humidityEl = document.createElement('li');
+    humidityEl.textContent = 'Humidity: ' + currentHumidity + '%';
+
+    currentWeatherEl.appendChild(currentEl);
+    currentEl.appendChild(setCityName);
+    currentEl.appendChild(dateEl);
+    currentEl.appendChild(iconEl);
+    currentEl.appendChild(temperatureEl);
+    currentEl.appendChild(windEl);
+    currentEl.appendChild(humidityEl);
+}
+function formatDate(timestamp) {
+    var date = new Date(timestamp * 1000);
+    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+  }
+  function getIconUrl(icon) {
+    return 'https://openweathermap.org/img/wn/'+ icon +'@2x.png'
+  }
+
+function displayFivedayforecast(fivedaysData, city) {
+        fivedaysEl.innerHTML = '';
+    for(var i=0; i < fivedaysData.list.length; i+=8){
+        console.log(fivedaysData.list[i])
+        var date = fivedaysData.list[i].dt;
+        var temp = fivedaysData.list[i].main.temp;
+        var humidity = fivedaysData.list[i].main.humidity;
+        var wind = fivedaysData.list[i].wind.speed;
+
+        var cardContainer = document.createElement('div');
+        cardContainer.classList = 'col';
+    
+        var card = document.createElement('div');
+        card.classList = 'card';
+    
+        var cardBody = document.createElement('div');
+        cardBody.classList = 'card-body';
+    
+        var dateEl = document.createElement('h5');
+        dateEl.classList = 'card-title';
+        dateEl.textContent = formatDate(date);
+    
+        var temperatureEl = document.createElement('p');
+        temperatureEl.classList = 'card-text';
+        temperatureEl.textContent = 'Temperature: ' + temp + '°F';
+    
+        var windEl = document.createElement('p');
+        windEl.classList = 'card-text';
+        windEl.textContent = 'Wind Speed: ' + wind + ' m/s';
+    
+        var humidityEl = document.createElement('p');
+        humidityEl.classList = 'card-text';
+        humidityEl.textContent = 'Humidity: ' + humidity + '%';
+    
+        cardBody.appendChild(dateEl);
+        cardBody.appendChild(temperatureEl);
+        cardBody.appendChild(windEl);
+        cardBody.appendChild(humidityEl);
+    
+        card.appendChild(cardBody);
+    
+        cardContainer.appendChild(card);
+    
+        fivedaysEl.appendChild(cardContainer);
+    }
+}
 form.addEventListener("submit", formSubmit);
+
 

@@ -23,19 +23,17 @@
     </nav>
     <div class="container text-center m-3">
         <div class="row">
-            <div class="col-md-auto bg-primary m-3">
+            <div class="col-md-auto m-3">
                 <div class="card m-2 p-3" style="width: 18rem;">
                     <form id="user-form" class="card-body">
                       <h5 class="card-title p-4 mb-2 fw-bolder">Search for city:</h5>
                       <input type="text" id="city" class="form-control"  placeholder="San Diego">
-                    
-                    <button type="submit" class="btn btn-primary">Search</button></form>
+                        <button type="submit" class="btn btn-primary m-3">Search</button></form>
                   </div>
             </div>
-            <div class="col-md-auto bg-success" id="currentWeatherContainer">
-                
-            </div>
+            <div class="col-md-auto" id="currentWeatherContainer"></div>
         </div>
+        <div class="row" id="fivedaysForecast"></div>
     </div>
     
     <script src="./assets/js/script.js"></script>
